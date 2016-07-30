@@ -3,11 +3,11 @@
 class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
 
     const PAYFORT_FORT_LOG_FILE = 'payfortfort.log';
-    
+
     private $_gatewayHost        = 'https://checkout.payfort.com/';
     private $_gatewaySandboxHost = 'https://sbcheckout.payfort.com/';
     //private $_gatewaySandboxHost = 'https://checkout.fortstg.com/';
-    
+
     public function deleteallCartItems() {
         $cartHelper = Mage::helper('checkout/cart');
         $items = $cartHelper->getCart()->getItems();
@@ -38,7 +38,7 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
 
         return $result;
     }
-    
+
     /**
      * Convert Amount with dicemal points
      * @param decimal $amount
@@ -56,12 +56,12 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
         $new_amount     = $new_amount * (pow(10, $decimal_points));
         return $new_amount;
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @param string $currency
-     * @param integer 
+     * @param integer
      */
     public function getCurrencyDecimalPoint($currency)
     {
@@ -80,7 +80,7 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
         }
         return $decimalPoint;
     }
-    
+
     /**
      * calculate fort signature
      * @param array $arr_data
@@ -93,7 +93,7 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
         $sha_out_pass_phrase = Mage::getStoreConfig('payment/payfort/sha_out_pass_phrase');
         $sha_type = Mage::getStoreConfig('payment/payfort/sha_type');
         $sha_type = str_replace('-', '', $sha_type);
-        
+
         $shaString = '';
 
         ksort($arr_data);
@@ -111,7 +111,7 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
 
         return $signature;
     }
-    
+
     public function getGatewayUrl($type='redirection') {
         $testMode = Mage::getStoreConfig('payment/payfort/sandbox_mode');
         if($type == 'notificationApi') {
@@ -120,10 +120,10 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
         else{
             $gatewayUrl = $testMode ? $this->_gatewaySandboxHost.'FortAPI/paymentPage' : $this->_gatewayHost.'FortAPI/paymentPage';
         }
-        
+
         return $gatewayUrl;
     }
-    
+
     public function getMerchantPageData() {
             $language = $this->getLanguage();
             $_order              = Mage::getModel('sales/order');
@@ -140,12 +140,12 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
             //calculate request signature
             $signature = $this->calculateSignature($gatewayParams, 'request');
             $gatewayParams['signature'] = $signature;
-            
+
             $gatewayUrl = $this->getGatewayUrl('merchantPage');
-            
+
             return array('url' => $gatewayUrl, 'params' => $gatewayParams);
     }
-    
+
     public function isMerchantPageMethod($order = '') {
         $useMerchantPage = Mage::getStoreConfig('payment/payfortcc/integration_type') == 'merchantPage' ? true : false;
         if(!empty($order)) {
@@ -159,7 +159,7 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
         }
         return false;
     }
-    
+
     /**
      * @param $name
      * @param $block
@@ -178,20 +178,20 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
 
         return '';
     }
-    
+
     /**
      * Log the error on the disk
      */
     public function log($messages, $forceDebug = false) {
         $debugMode = Mage::getStoreConfig('payment/payfort/debug_mode');
-        if(!$debugMode && !$forceLog) {
+        if(!$debugMode) {
             return;
         }
         Mage::log($messages, null, self::PAYFORT_FORT_LOG_FILE, true);
     }
-    
+
     public function getReturnUrl($path) {
-        if (Mage::app()->getStore()->isFrontUrlSecure() 
+        if (Mage::app()->getStore()->isFrontUrlSecure()
             && Mage::app()->getRequest()->isSecure()
         ) {
             // current page is https
@@ -202,7 +202,7 @@ class Payfort_Pay_Helper_Data extends Mage_Core_Helper_Abstract {
             return Mage::getBaseUrl() . $path;
         }
     }
-    
+
     public function getLanguage() {
         $language = Mage::getStoreConfig('payment/payfort/language');
         if ($language == 'no_language') {
